@@ -90,6 +90,7 @@ function imgSelected(e) {
     var messageId= document.querySelector('#msgid');
     messageId.append('Out of Clicks!');
     var results= document.getElementById('results');
+    // console.log(results);
     for (var v = 0; v < itemImages.length; v++) {
       var liEl= document.createElement('li');
       results.appendChild(liEl);
