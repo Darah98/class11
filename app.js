@@ -30,6 +30,7 @@ var leftRndmItem= [];
 var middleRndmItem= [];
 var rightRndmItem= [];
 var items= [];
+var noDuplicateCheck= [];
 var totalClicks= 0;
 
 
@@ -47,11 +48,24 @@ function getRndmItems(){
   leftRndmItem= items[rndmNmbr(0, items.length-1)];
   middleRndmItem= items[rndmNmbr(0, items.length-1)];
   rightRndmItem= items[rndmNmbr(0, items.length-1)];
-  while (leftRndmItem === middleItemImage || leftRndmItem === rightRndmItem || middleRndmItem === rightRndmItem){
+  while (leftRndmItem === middleRndmItem || leftRndmItem === rightRndmItem || middleRndmItem === rightRndmItem
+  || noDuplicateCheck.includes(leftRndmItem) || noDuplicateCheck.includes(middleRndmItem) || noDuplicateCheck.includes(rightRndmItem)){
     leftRndmItem= items[rndmNmbr(0, items.length-1)];
     middleRndmItem= items[rndmNmbr(0, items.length-1)];
     rightRndmItem= items[rndmNmbr(0, items.length-1)];
     // console.log('everything');
+  }
+
+
+  noDuplicateCheck.push(leftRndmItem);
+  noDuplicateCheck.push(middleRndmItem);
+  noDuplicateCheck.push(rightRndmItem);
+
+  if (noDuplicateCheck.length > 3) {
+
+    noDuplicateCheck.shift();
+    noDuplicateCheck.shift();
+    noDuplicateCheck.shift();
   }
   leftItemImage.setAttribute('src', leftRndmItem.urlImage);
   middleItemImage.setAttribute('src', middleRndmItem.urlImage);
@@ -64,7 +78,6 @@ function getRndmItems(){
 for (var i = 0; i < itemImages.length; i++) {
   new CoolItem(itemImages[i]);
 }
-
 function imgSelected(e) {
   if (e.target.id === 'left_item_img' || e.target.id === 'middle_item_img' || e.target.id === 'right_item_img') {
     getRndmItems();
@@ -82,7 +95,7 @@ function imgSelected(e) {
       rightRndmItem.clickPerImg++;
     }
   }
-  if (totalClicks === 26) {
+  if (totalClicks === 10) {
     actionSection.removeEventListener('click', imgSelected);
     leftItemImage.remove();
     middleItemImage.remove();
@@ -90,12 +103,12 @@ function imgSelected(e) {
     var messageId= document.querySelector('#msgid');
     messageId.append('Out of Clicks!');
     var results= document.getElementById('results');
-    // console.log(results);
     for (var v = 0; v < itemImages.length; v++) {
       var liEl= document.createElement('li');
       results.appendChild(liEl);
       liEl.append(`${items[v].description} had ${items[v].clickPerImg} votes and was shown ${items[v].totalViews} times`);
     }
+    showResults();
   }
 }
 actionSection.addEventListener('click', imgSelected);
@@ -104,4 +117,52 @@ getRndmItems();
 
 function rndmNmbr(min, max){
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function showResults(){
+  var itemsNamesArr= [];
+  var itemsClicksArr= [];
+  var itemsViewsArr= [];
+  for (var i = 0; i < items.length; i++) {
+    var itemName = items[i].description;
+    itemsNamesArr.push(itemName);
+    var itemClicks= items[i].clickPerImg;
+    itemsClicksArr.push(itemClicks);
+    var itemViews = items[i].totalViews;
+    itemsViewsArr.push(itemViews);
+  }
+
+  var ctx = document.getElementById('myItemsChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: itemsNamesArr,
+      datasets: [{
+        label: '# of Clicks',
+        data: itemsClicksArr,
+        backgroundColor:
+          'rgba(153, 102, 255, 0.2)',
+        borderColor:
+          'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }, {
+        label: '# of Views',
+        data: itemsViewsArr,
+        backgroundColor:
+        'rgba(255, 206, 86, 0.2)',
+        borderColor:
+        'rgba(153, 102, 255, 1)',
+        borderWidth: 1
+      }],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
 }
