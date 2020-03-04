@@ -120,7 +120,7 @@ function imgSelected(e) {
       rightRndmItem.clickPerImg++;
     }
   }
-  if (totalClicks === 5) {
+  if (totalClicks === 25) {
     actionSection.removeEventListener('click', imgSelected);
     leftItemImage.remove();
     middleItemImage.remove();
