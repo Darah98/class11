@@ -1,4 +1,8 @@
 'use strict';
+function rndmNmbr(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 var itemImages = [
   'bag.jpg',
   'banana.jpg',
@@ -34,15 +38,17 @@ var noDuplicateCheck= [];
 var totalClicks= 0;
 
 
-
-function CoolItem(name){
-  var description= itemImages[i].slice(0,-4);
-  this.description= description;
-  this.urlImage = `imgs/${name}`;
+function CoolItem(){
+  this.name= itemImages[i].slice(0,-4);
+  this.urlImage = `imgs/${itemImages[i]}`;
   this.clickPerImg= 0;
   this.totalViews= 0;
+  setItem();
+
   items.push(this);
+
 }
+
 
 function getRndmItems(){
   leftRndmItem= items[rndmNmbr(0, items.length-1)];
@@ -53,7 +59,7 @@ function getRndmItems(){
     leftRndmItem= items[rndmNmbr(0, items.length-1)];
     middleRndmItem= items[rndmNmbr(0, items.length-1)];
     rightRndmItem= items[rndmNmbr(0, items.length-1)];
-    // console.log('everything');
+    console.log('everything');
   }
 
 
@@ -62,7 +68,6 @@ function getRndmItems(){
   noDuplicateCheck.push(rightRndmItem);
 
   if (noDuplicateCheck.length > 3) {
-
     noDuplicateCheck.shift();
     noDuplicateCheck.shift();
     noDuplicateCheck.shift();
@@ -70,14 +75,27 @@ function getRndmItems(){
   leftItemImage.setAttribute('src', leftRndmItem.urlImage);
   middleItemImage.setAttribute('src', middleRndmItem.urlImage);
   rightItemImage.setAttribute('src', rightRndmItem.urlImage);
-  leftItemImage.setAttribute('alt', leftRndmItem.description);
-  middleItemImage.setAttribute('alt', middleRndmItem.description);
-  rightItemImage.setAttribute('alt', rightRndmItem.description);
+  leftItemImage.setAttribute('alt', leftRndmItem.name);
+  middleItemImage.setAttribute('alt', middleRndmItem.name);
+  rightItemImage.setAttribute('alt', rightRndmItem.name);
 }
 
 for (var i = 0; i < itemImages.length; i++) {
   new CoolItem(itemImages[i]);
 }
+
+function setItem(){
+  var itemStats = JSON.stringify(items);
+  localStorage.setItem( 'itemInfo', itemStats);
+}
+function getItem(){
+  var itemInfo = localStorage.getItem('itemInfo');
+  items = JSON.parse(itemInfo);
+  imgSelected();
+}
+
+
+
 function imgSelected(e) {
   if (e.target.id === 'left_item_img' || e.target.id === 'middle_item_img' || e.target.id === 'right_item_img') {
     getRndmItems();
@@ -95,42 +113,43 @@ function imgSelected(e) {
       rightRndmItem.clickPerImg++;
     }
   }
-  if (totalClicks === 10) {
-    actionSection.removeEventListener('click', imgSelected);
-    leftItemImage.remove();
-    middleItemImage.remove();
-    rightItemImage.remove();
-    var messageId= document.querySelector('#msgid');
-    messageId.append('Out of Clicks!');
-    var results= document.getElementById('results');
-    for (var v = 0; v < itemImages.length; v++) {
-      var liEl= document.createElement('li');
-      results.appendChild(liEl);
-      liEl.append(`${items[v].description} had ${items[v].clickPerImg} votes and was shown ${items[v].totalViews} times`);
-    }
-    showResults();
-  }
 }
+
+
+if (totalClicks === 5) {
+  actionSection.removeEventListener('click', imgSelected);
+  leftItemImage.remove();
+  middleItemImage.remove();
+  rightItemImage.remove();
+  var messageId= document.querySelector('#msgid');
+  messageId.append('Out of Clicks!');
+  var results= document.getElementById('results');
+  for (var v = 0; v < itemImages.length; v++) {
+    var liEl= document.createElement('li');
+    results.appendChild(liEl);
+    liEl.append(`${items[v].name} had ${items[v].clickPerImg} votes and was shown ${items[v].totalViews} times`);
+  }
+  showResults();
+}
+
+
 actionSection.addEventListener('click', imgSelected);
 getRndmItems();
-
-
-function rndmNmbr(min, max){
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+getItem();
 
 function showResults(){
   var itemsNamesArr= [];
   var itemsClicksArr= [];
   var itemsViewsArr= [];
   for (var i = 0; i < items.length; i++) {
-    var itemName = items[i].description;
+    var itemName = items[i].name;
     itemsNamesArr.push(itemName);
     var itemClicks= items[i].clickPerImg;
     itemsClicksArr.push(itemClicks);
     var itemViews = items[i].totalViews;
     itemsViewsArr.push(itemViews);
   }
+
 
   var ctx = document.getElementById('myItemsChart').getContext('2d');
   var myChart = new Chart(ctx, {
