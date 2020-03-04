@@ -1,4 +1,6 @@
 'use strict';
+getItem();
+
 function rndmNmbr(min, max){
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -30,6 +32,7 @@ var leftItemImage= document.querySelector('#left_item_img');
 var middleItemImage= document.querySelector('#middle_item_img');
 var rightItemImage= document.querySelector('#right_item_img');
 var actionSection= document.querySelector('#all_items');
+console.log(actionSection);
 var leftRndmItem= [];
 var middleRndmItem= [];
 var rightRndmItem= [];
@@ -43,7 +46,6 @@ function CoolItem(){
   this.urlImage = `imgs/${itemImages[i]}`;
   this.clickPerImg= 0;
   this.totalViews= 0;
-  setItem();
 
   items.push(this);
 
@@ -91,12 +93,17 @@ function setItem(){
 function getItem(){
   var itemInfo = localStorage.getItem('itemInfo');
   items = JSON.parse(itemInfo);
-  imgSelected();
+  console.log(itemInfo);
 }
 
 
 
+actionSection.addEventListener('click', imgSelected);
+getRndmItems();
+
+console.log(actionSection);
 function imgSelected(e) {
+
   if (e.target.id === 'left_item_img' || e.target.id === 'middle_item_img' || e.target.id === 'right_item_img') {
     getRndmItems();
     totalClicks++;
@@ -113,29 +120,26 @@ function imgSelected(e) {
       rightRndmItem.clickPerImg++;
     }
   }
-}
-
-
-if (totalClicks === 5) {
-  actionSection.removeEventListener('click', imgSelected);
-  leftItemImage.remove();
-  middleItemImage.remove();
-  rightItemImage.remove();
-  var messageId= document.querySelector('#msgid');
-  messageId.append('Out of Clicks!');
-  var results= document.getElementById('results');
-  for (var v = 0; v < itemImages.length; v++) {
-    var liEl= document.createElement('li');
-    results.appendChild(liEl);
-    liEl.append(`${items[v].name} had ${items[v].clickPerImg} votes and was shown ${items[v].totalViews} times`);
+  if (totalClicks === 5) {
+    actionSection.removeEventListener('click', imgSelected);
+    leftItemImage.remove();
+    middleItemImage.remove();
+    rightItemImage.remove();
+    var messageId= document.querySelector('#msgid');
+    messageId.append('Out of Clicks!');
+    var results= document.getElementById('results');
+    for (var v = 0; v < itemImages.length; v++) {
+      var liEl= document.createElement('li');
+      results.appendChild(liEl);
+      liEl.append(`${items[v].name} had ${items[v].clickPerImg} votes and was shown ${items[v].totalViews} times`);
+    }
+    showResults();
   }
-  showResults();
 }
 
 
-actionSection.addEventListener('click', imgSelected);
-getRndmItems();
-getItem();
+
+
 
 function showResults(){
   var itemsNamesArr= [];
@@ -149,6 +153,7 @@ function showResults(){
     var itemViews = items[i].totalViews;
     itemsViewsArr.push(itemViews);
   }
+  setItem();
 
 
   var ctx = document.getElementById('myItemsChart').getContext('2d');
