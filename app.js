@@ -32,7 +32,7 @@ var leftItemImage= document.querySelector('#left_item_img');
 var middleItemImage= document.querySelector('#middle_item_img');
 var rightItemImage= document.querySelector('#right_item_img');
 var actionSection= document.querySelector('#all_items');
-console.log(actionSection);
+// console.log(actionSection);
 var leftRndmItem= [];
 var middleRndmItem= [];
 var rightRndmItem= [];
@@ -48,9 +48,7 @@ function CoolItem(){
   this.totalViews= 0;
 
   items.push(this);
-
 }
-
 
 function getRndmItems(){
   leftRndmItem= items[rndmNmbr(0, items.length-1)];
@@ -93,15 +91,16 @@ function setItem(){
 function getItem(){
   var itemInfo = localStorage.getItem('itemInfo');
   items = JSON.parse(itemInfo);
-  console.log(itemInfo);
 }
-
-
+// if (localStorage.getItem(items.length) === null) {
+// } else {
+//   getItem();
+// }
 
 actionSection.addEventListener('click', imgSelected);
 getRndmItems();
+// getItem();
 
-console.log(actionSection);
 function imgSelected(e) {
 
   if (e.target.id === 'left_item_img' || e.target.id === 'middle_item_img' || e.target.id === 'right_item_img') {
@@ -137,10 +136,6 @@ function imgSelected(e) {
   }
 }
 
-
-
-
-
 function showResults(){
   var itemsNamesArr= [];
   var itemsClicksArr= [];
@@ -153,8 +148,8 @@ function showResults(){
     var itemViews = items[i].totalViews;
     itemsViewsArr.push(itemViews);
   }
-  setItem();
 
+  setItem();
 
   var ctx = document.getElementById('myItemsChart').getContext('2d');
   var myChart = new Chart(ctx, {
